@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSSIHMS Dashboard</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background-color: #2f8d46;
+      color: white;
+      flex-wrap: wrap;
+    }
+
+    .navbar .logo {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .navbar .search {
+      flex: 1;
+      max-width: 500px;
+      margin: 10px;
+    }
+
+    .navbar .search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .navbar .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .navbar .nav-links a {
+      text-decoration: none;
+      background: linear-gradient(90deg, #4f8cff 0%, #235390 100%);
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(36, 188, 137, 0.69);
+      transition: background 0.4s cubic-bezier(.4,2.3,.3,1), transform 0.2s;
+      display: inline-block;
+    }
+
+    .navbar .nav-links a:hover {
+      background: linear-gradient(90deg, #43e97b 0%, #fabb00 50%, #ff5722 100%);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    .navbar .nav-links a:active {
+      background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">SSSIHMS</div>
+    <div class="search">
+      <input type="text" placeholder="Search...">
+    </div>
+    <nav class="nav-links">
+      <a href="/hospital/">Hospital Specialities</a>
+      <a href="/visit-stats/">Patient Statistics</a>
+      <a href="/hospital-report/">Hospital Dashboard</a>
+      <a href="/hospitals/">Patient Dashboard</a>
+    </nav>
+  </header>
+</body>
+</html>

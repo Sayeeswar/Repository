@@ -1,0 +1,121 @@
+<h2>Hospital Analytics Report</h2>
+
+<form method="get" action="{% url 'hospital_report' %}">
+  <label for="hospital">Select Hospital:</label>
+  <select name="hospital" id="hospital">
+    <option value="">--Choose--</option>
+    {% for hosp in hospitals %}
+      <option value="{{ hosp }}" {% if hosp == hospital %}selected{% endif %}>{{ hosp }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="speciality">Select Speciality:</label>
+  <select name="speciality" id="speciality">
+    <option value="">--Choose--</option>
+    {% for spec in speciality %}
+      <option value="{{ spec }}" {% if spec == speciality %}selected{% endif %}>{{ spec }}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit">Show Report</button>
+</form>
+
+{% if hospital and speciality %}
+  <h3>Selected Hospital: <span class="text-primary">{{ hospital }} - {{ speciality }}</span></h3>
+
+
+<div style="margin-top: 30px;">
+  <h4>Total Patients</h4>
+  <p style="font-size: 32px; font-weight: bold; color: steelblue;">
+    {{ total_patients }}
+  </p>
+</div>
+
+ 
+
+<div style="margin-top: 30px; max-width: 600px;">
+  <h4 style="font-size: 18px;">Patient Category Breakdown</h4>
+  <canvas id="barChart" height="200" style="max-height: 200px;"></canvas>
+</div>
+
+
+  <div style="margin-top: 30px;">
+    <h4>Monthly Patient Trends by Category</h4>
+    <canvas id="lineChart" height="100"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    console.log("JS Loaded");
+
+    const deptLabels = {{ dept_labels|safe }};
+    const deptValues = {{ dept_values|safe }};
+    const categoryLabels = {{ category_labels|safe }};
+    const categoryValues = {{ category_values|safe }};
+    const months = {{ months|safe }};
+    const categorySeries = {{ category_series|safe }};
+
+    const colors = {
+      NEWVISIT: 'blue',
+      REVISIT: 'orange',
+      DISCHARGES: 'green',
+      ADMISSIONS: 'red'
+    };
+
+    // Bar Chart
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: deptLabels,
+        datasets: [{
+          label: 'Total Visits',
+          data: deptValues,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)'
+        }]
+      }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: categoryLabels,
+        datasets: [{
+          data: categoryValues,
+          backgroundColor: Object.values(colors)
+        }]
+      }
+    });
+
+    // Line Chart
+    const lineDatasets = Object.keys(categorySeries).map(cat => ({
+      label: cat,
+      data: categorySeries[cat],
+      borderColor: colors[cat] || 'gray',
+      fill: false,
+      tension: 0.3
+    }));
+
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: lineDatasets
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          title: { display: true, text: 'Monthly Trends by Category' }
+        },
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  </script>
+{% endif %}

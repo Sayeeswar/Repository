@@ -1,0 +1,10 @@
+<h2>Select a Hospital</h2>
+<ul>
+  {% for hospital in hospitals %}
+    <li>
+        <a href="{% url 'hospital_dashboard' hospital %}">
+            <button>{{ hospital }}</button>
+        </a>
+    </li>
+  {% endfor %}
+</ul>

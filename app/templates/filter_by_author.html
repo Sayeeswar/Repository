@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filter Books by Author</title>
+</head>
+<body>
+    <h2>Filter Books by Author</h2>
+
+    <form method="get">
+        <label for="author">Choose an author:</label>
+        <select name="author" id="author" onchange="this.form.submit()">
+            <option value="">-- Select Author --</option>
+            {% for author in authors %}
+                <option value="{{ author.id }}" {% if author.id|stringformat:"s" == selected_author %}selected{% endif %}>
+                    {{ author.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if books %}
+        <h3>Books by {{ books.0.author.name }}</h3>
+        <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Published</th>
+                <th>ISBN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author.name }}</td>
+                <td>{{ book.published_date }}</td>
+                <td>{{ book.isbn }}</td>
+            </tr>
+            {% endfor %}
+    {% elif selected_author %}
+        <p>No books found for this author.</p>
+    {% endif %}
+</body>
+</html>

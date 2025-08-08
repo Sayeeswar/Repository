@@ -1,0 +1,67 @@
+<h2>Select Hospital</h2>
+<div>
+    {% for h in hospitals %}
+        <form method="get" style="display:inline;">
+            <input type="hidden" name="hospital" value="{{ h }}">
+            <button type="submit" class="modern-btn">{{ h }}</button>
+        </form>
+    {% endfor %}
+</div>
+
+{% if not selected_hospital %}
+    <h2>Overall Hospital Stats</h2>
+    <div>Total Discharges: {{ total_discharges }}</div>
+    <div>Total Admissions: {{ total_admissions }}</div>
+    <div>Total Outpatients: {{ total_new }}</div>
+    <div>Total Revisits: {{ total_revisit }}</div>
+
+    <h3>Department Comparison</h3>
+    <canvas id="deptChart"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('deptChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ dept_labels|safe }},
+                datasets: [{
+                    label: 'Patients by Department',
+                    data: {{ dept_values|safe }},
+                    borderWidth: 1
+                }]
+            }
+        });
+    </script>
+{% else %}
+    <h2>Stats for {{ selected_hospital }}</h2>
+    <div>Total Discharges: {{ total_discharges }}</div>
+    <div>Total Admissions: {{ total_admissions }}</div>
+    <div>Total Outpatients: {{ total_new }}</div>
+    <div>Total Revisits: {{ total_revisit }}</div>
+
+    <h3>Departments</h3>
+     <h3>Department Outpatients & Inpatients</h3>
+    <ul>
+        {% for dept, stats in department_stats.items %}
+            <li>
+                <strong>{{ dept }}</strong>:
+                Outpatients: {{ stats.outpatients }},
+                Inpatients: {{ stats.inpatients }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if selected_department %}
+        <h3>Stats for {{ selected_department }}</h3>
+        {% for dept, stats in department_stats.items %}
+            {% if dept == selected_department %}
+                <div>
+                    Outpatients: {{ stats.outpatients }} <br>
+                    Inpatients: {{ stats.inpatients }}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+       
+    {% endif %}
+{% endif %}
