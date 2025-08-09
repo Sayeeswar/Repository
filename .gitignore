@@ -1,0 +1,21 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment files
+.env
+
+# Local virtual environments
+venv/
+env/
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# Database (only if you use SQLite locally — Render will use PostgreSQL)
+db.sqlite3
+
+# VS Code settings
+.vscode/
