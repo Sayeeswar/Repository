@@ -18,6 +18,7 @@
       background-color: #f9f9f9;
     }
 
+    /* Navigation bar container */
     .navbar {
       display: flex;
       align-items: center;
@@ -46,13 +47,14 @@
       border-radius: 4px;
     }
 
-    .navbar .nav-links {
+    /* Nav links */
+    .navbar nav {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
 
-    .navbar .nav-links a {
+    .navbar nav a {
       text-decoration: none;
       background: linear-gradient(90deg, #4f8cff 0%, #235390 100%);
       color: #fff;
@@ -65,14 +67,27 @@
       display: inline-block;
     }
 
-    .navbar .nav-links a:hover {
+    .navbar nav a:hover {
       background: linear-gradient(90deg, #43e97b 0%, #fabb00 50%, #ff5722 100%);
       transform: translateY(-2px) scale(1.03);
     }
 
-    .navbar .nav-links a:active {
+    .navbar nav a:active {
       background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
       color: #fff;
+    }
+
+    /* Section fade-in animation */
+    section {
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: auto;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
   </style>
 </head>
@@ -82,12 +97,17 @@
     <div class="search">
       <input type="text" placeholder="Search...">
     </div>
-    <nav class="nav-links">
+    <nav>
       <a href="/hospital/">Hospital Specialities</a>
       <a href="/visit-stats/">Patient Statistics</a>
       <a href="/hospital-report/">Hospital Dashboard</a>
       <a href="/hospitals/">Patient Dashboard</a>
     </nav>
   </header>
+
+  <section>
+    <h1>Welcome to the Dashboard</h1>
+    <p>This is where your Django app content will appear.</p>
+  </section>
 </body>
 </html>
