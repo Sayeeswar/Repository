@@ -1,37 +1,8 @@
 from django.shortcuts import render
-from .models import Book, Author, HospitalMaster, HospitalVisit
+from .models import HospitalMaster, HospitalVisit
 from django.db.models import Sum,Q
 import json
 from collections import defaultdict
-
-def book_list(request):
-    books = Book.objects.select_related('author').all()
-    return render(request, 'book_list.html', {'books': books})
-
-def book_table(request):
-    books = Book.objects.select_related('author').all()
-    return render(request, 'book_table.html', {'books': books})
-
-def book_search(request):
-    query = request.GET.get('q')
-    books = Book.objects.filter(title__icontains=query) if query else []
-    return render(request, 'book_search.html', {'books': books, 'query': query})
-
-def filter_by_author(request):
-    authors = Author.objects.all()
-    selected_author = request.GET.get('author')
-    books = Book.objects.filter(author__id=selected_author) if selected_author else []
-
-    return render(request, 'filter_by_author.html', {
-        'books': books,
-        'authors': authors,
-        'selected_author': selected_author
-    })
-
-from django.shortcuts import render
-from .models import HospitalVisit
-from django.db.models import Sum
-
 def hospital_overview(request):
     hospitals = HospitalVisit.objects.values_list('hospital', flat=True).distinct()
     selected_hospital = request.GET.get('hospital', '').strip()
