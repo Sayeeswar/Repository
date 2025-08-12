@@ -2,10 +2,10 @@
 {% load static %}
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SSSIHMS Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
   <style>
     * {
       margin: 0;
@@ -16,98 +16,144 @@
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
+      display: flex;
+      min-height: 100vh;
     }
 
-    /* Navigation bar container */
-    .navbar {
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 240px;
+      background-color: white;
+      padding: 20px 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background-color: #2f8d46;
+      flex-direction: column;
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #1c2d5f;
+    }
+
+    .menu {
+      list-style: none;
+      padding: 0;
+      flex-grow: 1;
+    }
+
+    .menu li {
+      padding: 12px 25px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .menu li:hover {
+      background-color: #f0f2f5;
+    }
+
+    .menu li.active {
+      background-color: #1c2d5f;
       color: white;
-      flex-wrap: wrap;
-    }
-
-    .navbar .logo {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-
-    .navbar .search {
-      flex: 1;
-      max-width: 500px;
-      margin: 10px;
-    }
-
-    .navbar .search input {
-      width: 100%;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-    }
-
-    /* Nav links */
-    .navbar nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .navbar nav a {
-      text-decoration: none;
-      background: linear-gradient(90deg, #4f8cff 0%, #235390 100%);
-      color: #fff;
       border-radius: 8px;
-      padding: 12px 20px;
-      font-size: 1rem;
-      font-weight: 600;
-      box-shadow: 0 2px 8px rgba(36, 188, 137, 0.69);
-      transition: background 0.4s cubic-bezier(.4,2.3,.3,1), transform 0.2s;
-      display: inline-block;
     }
 
-    .navbar nav a:hover {
-      background: linear-gradient(90deg, #43e97b 0%, #fabb00 50%, #ff5722 100%);
-      transform: translateY(-2px) scale(1.03);
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .navbar nav a:active {
-      background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
-      color: #fff;
+    /* Card Style */
+    .card {
+      width: 250px;
+      background-color: #e9e7fc;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: left;
     }
-
-    /* Section fade-in animation */
-    section {
-      padding: 40px 20px;
-      max-width: 900px;
-      margin: auto;
-      animation: fadeIn 1.5s ease-in;
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
+    .card p {
+      font-size: 28px;
+      font-weight: bold;
+      margin: 10px 0 5px;
+      color: #1c2d5f;
+    }
+    .card span {
+      font-size: 13px;
+      color: #777;
+    }
+    .text {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .cards-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
     }
   </style>
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo">SSSIHMS</div>
-    <div class="search">
-      <input type="text" placeholder="Search...">
-    </div>
-    <nav>
-      <a href="/hospital/">Hospital Specialities</a>
-      <a href="/visit-stats/">Patient Statistics</a>
-      <a href="/hospital-report/">Hospital Dashboard</a>
-      <a href="/hospitals/">Patient Dashboard</a>
-    </nav>
-  </header>
+  <!-- Sidebar -->
+  <div class="sidebar">
+  <h2>HavenMed</h2>
+  <ul class="menu">
 
-  <section>
-    <h1>Welcome to the Dashboard</h1>
-    <p>This is where your Django app content will appear.</p>
-  </section>
+    <li class="active">
+      <a href="{% url 'hospital' %}">Dashboard</a>
+    </li>
+    <li>
+      <a href="{% url 'hospital_filter' %}">Hospital Specialities</a>
+    </li>
+    <li>
+      <a href="{% url 'visit_stats' %}">Patient Statistics</a>
+    </li>
+    <li>
+      
+      <a href="{% url 'hospital_report' %}">Hospital Dashboard</a>
+    
+    <li>
+      <a href="{% url 'hospital_profile' hospital_code='H001' %}">Hospital Profile</a>
+      <!-- Replace 'H001' with a dynamic value in your template -->
+    </li>
+  </ul>
+</div>
+
+
+  <!-- Content -->
+  <div class="content">
+    <div class="cards-row">
+      <div class="card">
+        <h3>Total Patients</h3>
+        <p class="text">
+          {{ total_new|default:0|add:total_revisit|default:0 }}
+        </p>
+        <span>150 more than yesterday</span>
+      </div>
+      <div class="card">
+        <h3>Total Discharges</h3>
+        <p class="text">{{ total_discharges|default:0 }}</p>
+        <span>20 more than yesterday</span>
+      </div>
+      <div class="card">
+        <h3>Total Admissions</h3>
+        <p class="text">{{ total_admissions|default:0 }}</p>
+        <span>10 more than yesterday</span>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
