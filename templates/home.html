@@ -1,159 +1,369 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SSSIHMS Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  
+  <!-- Chart.js for Graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* ====== GLOBAL STYLES ====== */
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f6f8fa;
       display: flex;
-      min-height: 100vh;
     }
 
-    /* Sidebar Navigation */
+    /* ====== SIDEBAR ====== */
     .sidebar {
       width: 240px;
       background-color: white;
-      padding: 20px 0;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar h2 {
-      font-size: 20px;
-      text-align: center;
-      margin-bottom: 30px;
-      color: #1c2d5f;
-    }
-
-    .menu {
-      list-style: none;
-      padding: 0;
-      flex-grow: 1;
-    }
-
-    .menu li {
-      padding: 12px 25px;
-      cursor: pointer;
-      font-size: 15px;
-      color: #333;
-      transition: background 0.2s;
-    }
-
-    .menu li:hover {
-      background-color: #f0f2f5;
-    }
-
-    .menu li.active {
-      background-color: #1c2d5f;
-      color: white;
-      border-radius: 8px;
-    }
-
-    /* Content Area */
-    .content {
-      flex: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Card Style */
-    .card {
-      width: 250px;
-      background-color: #e9e7fc;
-      border-radius: 16px;
+      height: 100vh;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      text-align: left;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
     }
-    .card h3 {
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo h2 {
       margin: 0;
-      font-size: 18px;
-      color: #333;
-    }
-    .card p {
-      font-size: 28px;
-      font-weight: bold;
-      margin: 10px 0 5px;
       color: #1c2d5f;
     }
-    .card span {
-      font-size: 13px;
+
+    .logo p {
+      font-size: 12px;
       color: #777;
     }
-    .text {
-      font-size: 16px;
-      color: #333;
-      margin-bottom: 10px;
+
+    nav ul, .other-menu ul, .help-settings ul {
+      list-style: none;
+      padding: 0;
     }
-    .cards-row {
+
+    nav ul li, .other-menu ul li, .help-settings ul li {
+      padding: 10px;
+      color: #444;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+
+    nav ul li.active, nav ul li:hover,
+    .other-menu ul li:hover, .help-settings ul li:hover {
+      background-color: #e0f2f1;
+      color: #009688;
+    }
+
+    /* ====== MAIN CONTENT ====== */
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .top-bar input {
+      padding: 8px;
+      width: 300px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+
+    /* ====== CARDS ====== */
+    .cards {
       display: flex;
       gap: 20px;
-      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      flex: 1;
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .number {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+
+    .change {
+      font-size: 14px;
+      color: green;
+    }
+
+    .sub {
+      font-size: 12px;
+      color: #777;
+    }
+
+    /* ====== STATS + CALENDAR ====== */
+    .stats-calendar {
+      display: flex;
+      gap: 20px;
+    }
+
+    .stats, .calendar {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      flex: 1;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Simple Calendar */
+    .calendar table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+    }
+
+    .calendar th, .calendar td {
+      padding: 10px;
+    }
+
+    .calendar th {
+      color: #009688;
+    }
+
+    .calendar td {
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .calendar td:hover {
+      background-color: #e0f2f1;
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-  <h2>HavenMed</h2>
-  <ul class="menu">
 
-    <li class="active">
-      <a href="{% url 'hospital' %}">Dashboard</a>
-    </li>
-    <li>
-      <a href="{% url 'hospital_filter' %}">Hospital Specialities</a>
-    </li>
-    <li>
-      <a href="{% url 'visit_stats' %}">Patient Statistics</a>
-    </li>
-    <li>
-      
-      <a href="{% url 'hospital_report' %}">Hospital Dashboard</a>
-    
-    <li>
-      <a href="{% url 'hospital_profile' hospital_code='H001' %}">Hospital Profile</a>
-      <!-- Replace 'H001' with a dynamic value in your template -->
-    </li>
-  </ul>
-</div>
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar">
+  <div class="logo">
+    <h2>SSIHMS</h2>
+    <p>Dashboard</p>
+  </div>
 
+  <!-- Main Menu -->
+  <nav>
+    <ul>
+      <li class="active">Overview</li>
+      <li><a href="hospitals/">Revenue</a></li>
+      <li>Department</a></li>
+    </ul>
+  </nav>
 
-  <!-- Content -->
-  <div class="content">
-    <div class="cards-row">
-      <div class="card">
-        <h3>Total Patients</h3>
-        <p class="text">
-          {{ total_new|default:0|add:total_revisit|default:0 }}
-        </p>
-        <span>150 more than yesterday</span>
-      </div>
-      <div class="card">
-        <h3>Total Discharges</h3>
-        <p class="text">{{ total_discharges|default:0 }}</p>
-        <span>20 more than yesterday</span>
-      </div>
-      <div class="card">
-        <h3>Total Admissions</h3>
-        <p class="text">{{ total_admissions|default:0 }}</p>
-        <span>10 more than yesterday</span>
-      </div>
+  <!-- Other Menu -->
+  <div class="other-menu">
+    <ul>
+      <li>Doctors</li>
+      <li>Employee</li>
+      <li>Product & Stock</li>
+      <!-- visit-stats -->
+      <a href="{% url 'visit_stats' %}">Visit Stats</a>
+
+<!-- hospital filter -->
+<a href="{% url 'hospital_filter' %}">Hospital Filter</a>
+
+<!-- hospital profile (needs hospital_code argument) -->
+<a href="{% url 'hospital_profile' hospital_code='PSG' %}">Hospital Profile (PSG)</a>
+
+<!-- hospital report -->
+<a href="{% url 'hospital_report' %}">Hospital Report</a>
+
+<!-- hospital overview -->
+<a href="{% url 'hospital' %}">Hospital Overview</a>
+
+    </ul>
+  </div>
+
+  <!-- Help & Settings -->
+  <div class="help-settings">
+    <ul>
+      <li>
+        <a href="/admin/">Admin</a>
+        </li>
+      <li>Report</li>
+    </ul>
+  </div>
+</aside>
+
+<!-- ====== MAIN CONTENT ====== -->
+<main class="content">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <input type="text" placeholder="Search anything here">
+    <div class="user-info">
+      <span>Todays Data 👋</span>
     </div>
   </div>
+
+  <!-- Cards -->
+  <section class="cards">
+    <div class="card">
+      <h3>Overall visitors</h3>
+      <p class="number"> {{totals}} <span class="change">+15.2%</span></p>
+      <p></p>
+      <p class="sub">1,345 today</p>
+    </div>
+
+    <div class="card">
+      <h3>Total new patients</h3>
+      <p class="number">{{total_new}}<span class="change">+10.4%</span></p>
+      <p>Increase in data by 500 inpatients in the last 7 days</p>
+    </div>
+
+    <div class="card">
+      <h3>Total discharges</h3>
+      <p class="number">{{total_discharges}} <span class="change">+165</span></p>
+      <p>Visitor data obtained for the last 7 days from 10.2% to 15.7%</p>
+      <p class="sub">1,345 today</p>
+    </div>
+  </section>
+
+  <!-- Stats & Calendar -->
+  <div class="stats-calendar">
+    <div class="stats">
+      <canvas id="visitChart" width="600" height="300"></canvas>
+    </div>
+
+    <div class="calendar">
+      <h3>Simple Calendar</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+          </tr>
+          <tr>
+            <td>15</td>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+            <td>21</td>
+          </tr>
+          <tr>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+            <td>27</td>
+            <td>28</td>
+          </tr>
+          <tr>
+            <td>29</td>
+            <td>30</td>
+            <td>31</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+    const labels = {{ labels|safe }};
+    const newvisits = {{ newvisits|safe }};
+    const revisits = {{ revisits|safe }};
+    const discharges = {{ discharges|safe }};
+    const admissions = {{ admissions|safe }};
+
+    const ctx = document.getElementById('visitChart').getContext('2d');
+
+    const visitChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'New Visits',
+                    data: newvisits,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                },
+                {
+                    label: 'Revisits',
+                    data: revisits,
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                },
+                {
+                    label: 'Discharges',
+                    data: discharges,
+                    backgroundColor: 'rgba(25, 213, 122, 0.7)'
+                },
+                {
+                    label: 'Admissions',
+                    data: admissions,
+                    backgroundColor: 'rgba(174, 20, 97, 0.7)'
+                }
+            ]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                x: { stacked: false },
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 100 }
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>

@@ -5,7 +5,7 @@ import json
 from collections import defaultdict
 def hospital_overview(request):
     hospitals = HospitalVisit.objects.values_list('hospital', flat=True).distinct()
-    selected_hospital = request.GET.get('hospital', '').strip()
+    selected_hospital = request.GET.get("hospital")
     selected_department = request.GET.get('departments', '').strip()
 
     context = {
@@ -131,6 +131,7 @@ def visit_stats(request):
         'hospital': hospital,
         'speciality': speciality,
         'year': year,
+
     }
     return render(request, 'visit_stats.html', context)
 

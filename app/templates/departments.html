@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hospitals & Departments</title>
+  <style>
+    body{font-family:Arial;margin:30px;background:#f9f9f9}
+    .btn{padding:10px 20px;margin:5px;border:none;border-radius:6px;
+         background:#007bff;color:white;text-decoration:none}
+    .btn.secondary{background:#6c757d}
+    .dept{display:inline-block;margin:5px;padding:8px 14px;
+          background:#28a745;color:#fff;border-radius:20px}
+  </style>
+</head>
+<body>
+  <h1>Select a Hospital</h1>
+
+  <!-- Show hospital buttons -->
+  {% if selected_hospital %}
+    {% for h in hospitals %}
+      {% if h == selected %}
+        <a class="btn" href="?hospital={{ h }}">{{ h }}</a>
+      {% endif %}
+    {% endfor %}
+    <a class="btn secondary" href=".">Back</a>
+  {% else %}
+    {% for h in hospitals %}
+      <a class="btn" href="?hospital={{ h }}">{{ h }}</a>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Show departments for selected hospital -->
+  {% if selected_hospital %}
+    <h2>Departments in {{ selected_hospital }}</h2>
+    {% for dept in specialities %}
+      <span class="dept">{{ dept }}</span>
+    {% endfor %}
+  {% endif %}
+</body>
+</html>

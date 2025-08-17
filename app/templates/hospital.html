@@ -1,67 +1,77 @@
-<h2>Select Hospital</h2>
-<div>
-    {% for h in hospitals %}
-        <form method="get" style="display:inline;">
-            <input type="hidden" name="hospital" value="{{ h }}">
-            <button type="submit" class="modern-btn">{{ h }}</button>
-        </form>
-    {% endfor %}
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospital Overview</title>
+  <style>
+    .button-container {
+      margin: 20px 0;
+    }
+    .button-container button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .button-container button:hover {
+      background: #0056b3;
+    }
+  </style>
+  <script>
+    function selectHospital(hospital) {
+      // Hide all hospital buttons
+      document.getElementById("hospital-buttons").style.display = "none";
 
-{% if not selected_hospital %}
-    <h2>Overall Hospital Stats</h2>
-    <div>Total Discharges: {{ total_discharges }}</div>
-    <div>Total Admissions: {{ total_admissions }}</div>
-    <div>Total Outpatients: {{ total_new }}</div>
-    <div>Total Revisits: {{ total_revisit }}</div>
+      // Redirect with ?hospital= selected
+      const url = new URL(window.location.href);
+      url.searchParams.set("hospital", hospital);
+      window.location.href = url.toString();
+    }
 
-    <h3>Department Comparison</h3>
-    <canvas id="deptChart"></canvas>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('deptChart');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ dept_labels|safe }},
-                datasets: [{
-                    label: 'Patients by Department',
-                    data: {{ dept_values|safe }},
-                    borderWidth: 1
-                }]
-            }
-        });
-    </script>
-{% else %}
-    <h2>Stats for {{ selected_hospital }}</h2>
-    <div>Total Discharges: {{ total_discharges }}</div>
-    <div>Total Admissions: {{ total_admissions }}</div>
-    <div>Total Outpatients: {{ total_new }}</div>
-    <div>Total Revisits: {{ total_revisit }}</div>
+    function selectDepartment(dept) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("departments", dept);
+      window.location.href = url.toString();
+    }
+  </script>
+</head>
+<body>
+  <h1>Hospital Overview</h1>
 
-    <h3>Departments</h3>
-     <h3>Department Outpatients & Inpatients</h3>
-    <ul>
+  <!-- Hospital Buttons -->
+  {% if not selected_hospital %}
+    <div id="hospital-buttons" class="button-container">
+      {% for h in hospitals %}
+        <button onclick="selectHospital('{{ h }}')">{{ h }}</button>
+      {% endfor %}
+    </div>
+  {% else %}
+    <h2>Selected Hospital: {{ selected_hospital }}</h2>
+
+    <!-- Department Buttons -->
+    <div class="button-container">
+      {% for dept in departments %}
+        <button onclick="selectDepartment('{{ dept }}')">{{ dept }}</button>
+      {% endfor %}
+    </div>
+
+    <!-- Department stats -->
+    {% if department_stats %}
+      <h3>Department Stats</h3>
+      <ul>
         {% for dept, stats in department_stats.items %}
-            <li>
-                <strong>{{ dept }}</strong>:
-                Outpatients: {{ stats.outpatients }},
-                Inpatients: {{ stats.inpatients }}
-            </li>
+          <li>
+            <b>{{ dept }}</b> → Outpatients: {{ stats.outpatients }}, Inpatients: {{ stats.inpatients }}
+          </li>
         {% endfor %}
-    </ul>
-
-    {% if selected_department %}
-        <h3>Stats for {{ selected_department }}</h3>
-        {% for dept, stats in department_stats.items %}
-            {% if dept == selected_department %}
-                <div>
-                    Outpatients: {{ stats.outpatients }} <br>
-                    Inpatients: {{ stats.inpatients }}
-                </div>
-            {% endif %}
-        {% endfor %}
-
-       
+      </ul>
     {% endif %}
-{% endif %}
+  {% endif %}
+
+  <!-- Optional: Time series chart data for selected department -->
+  
+</body>
+</html>
