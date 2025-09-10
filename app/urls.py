@@ -8,6 +8,7 @@ urlpatterns = [
     path('hospitalsb/<str:hospital_code>/', views.hospital_profile, name='hospital_profile'),
     path('hospital-report/', views.hospital_report, name='hospital_report'),
     path('hospitals/', views.hospital_overview, name='hospital'),
+    path('surgeries/', views.Surgeries, name='surgeries'),
 
   # updated here
 ]
