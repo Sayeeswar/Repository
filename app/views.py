@@ -38,6 +38,7 @@ def hospital_overview(request):
         context['total_admissions'] = hospital_qs.filter(category__iexact='ADMISSIONS').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_new'] = hospital_qs.filter(subcatg__iexact='NEWVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_revisit'] = hospital_qs.filter(subcatg__iexact='REVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
+        context['surgereis'] = hospital_qs.filter(category__iexact='SURGERIES').aggregate(total=Sum('thevalue'))['total'] or 0
 
         # List of departments
         departments = hospital_qs.values_list('speciality', flat=True).distinct()
@@ -305,5 +306,104 @@ def hospital_report(request):
 
     return render(request, 'hopital_report.html', context)
 
+# views.py
+from django.shortcuts import render
+from .models import HospitalVisit
 
+def hospitaloverview(request):
+    hospitals = HospitalVisit.objects.values_list("hospital", flat=True).distinct()
+    selected_hospital = request.GET.get("hospital")
+    selected_department = request.GET.get("speciality")  # Assuming this is the department
+    selected_subcatg = request.GET.get("subcatg")
 
+    qs = HospitalVisit.objects.none()  # Start with an empty queryset
+
+    if selected_hospital:
+        # Fetch specialities for the selected hospital
+        specialities = HospitalVisit.objects.filter(hospital=selected_hospital).values_list("speciality", flat=True).distinct()
+
+        if selected_department:
+            # Filter by hospital and department
+            qs = HospitalVisit.objects.filter(
+                hospital=selected_hospital,
+                speciality=selected_department,
+                category__iexact="SURGERIES"  # Assuming you want surgeries
+            )
+
+            if selected_subcatg:
+                qs = qs.filter(subcatg=selected_subcatg)  # Filter by subcategory
+
+    context = {
+        "hospitals": hospitals,
+        "selected_hospital": selected_hospital,
+        "specialities": specialities if selected_hospital else None,
+        "selected_department": selected_department,
+        "selected_subcatg": selected_subcatg,
+        "qs": qs  # This will contain the filtered queryset
+    }
+    return render(request, "departments.html", context)
+from django.shortcuts import render
+from django.db.models import Count, Avg, F,Sum
+from .models import HospitalVisit  # Assuming your model is named HospitalVisit
+
+def Surgeries(request):
+    # Base Query: Get all surgeries
+    surgeries = HospitalVisit.objects.filter(category__iexact="SURGERIES")
+
+    # Get unique departments for the sidebar
+    surgeries_department = surgeries.values_list('speciality', flat=True).distinct()
+
+    # Get the selected department from the GET parameters
+    department = request.GET.get("department")
+
+    # Filter surgeries by the selected department, if one exists
+    if department:
+        filtered_surgeries = surgeries.filter(speciality=department)
+    else:
+        filtered_surgeries = surgeries
+    
+    # Calculate Dashboard Statistics
+    # You'll need to define what these fields mean in your model (e.g., a 'success' boolean, 'is_active' field, 'scheduled_date' field)
+    total_procedures = filtered_surgeries.count()
+
+    # Example: Calculating success rate (assuming a 'success' field exists)
+    # success_rate = filtered_surgeries.filter(success=True).count() / total_procedures if total_procedures > 0 else 0
+    # For now, let's use a placeholder until you provide more info on your model fields.
+    success_rate = 95.5 # Placeholder
+
+    # Example: Counting active patients (assuming a 'is_active' or similar field)
+    # active_patients = filtered_surgeries.filter(is_active=True).distinct('patient_id').count()
+    # For now, let's use a placeholder.
+    active_patients = 125 # Placeholder
+
+    # Example: Counting scheduled today (assuming a 'scheduled_date' field)
+    # from datetime import date
+    # scheduled_today = filtered_surgeries.filter(scheduled_date=date.today()).count()
+    # For now, let's use a placeholder.
+    scheduled_today = 8 # Placeholder
+
+    # Get unique subcategories/descriptions for the filtered department
+    if department:
+        surgeries_subcatg = filtered_surgeries.values_list('subcatg', flat=True).distinct()
+    else:
+        surgeries_subcatg = None
+
+    # Combine all stats into a single dictionary
+    stats = {
+        "surgeries_count": total_procedures,
+        "success_rate": success_rate,
+        "active_patients": active_patients,
+        "scheduled_today": scheduled_today,
+    }
+
+    return render(
+        request,
+        "surgeries.html",
+        {
+            "surgeries": filtered_surgeries,
+            "surgeries_department": surgeries_department,
+            "surgeries_subcatg": surgeries_subcatg,
+            "stats": stats,
+            "department": department # Pass the selected department to the template
+        },
+    )

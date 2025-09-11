@@ -27,6 +27,9 @@
       display: flex;
       flex-direction: column;
     }
+    .sidebar.hidden {
+    display: none;
+  }
 
     .logo {
       text-align: center;
@@ -156,12 +159,59 @@
     .calendar td:hover {
       background-color: #e0f2f1;
     }
+   
+@media (max-width: 768px) {
+    /*
+    1. For mobile, the sidebar needs to be fixed and a toggle button is used.
+    */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+        transform: translateX(-100%); /* Hides the sidebar by default on mobile */
+    }
+
+    /*
+    2. This is the crucial part:
+    When the "hidden" class is *removed* by your JavaScript, this rule will apply.
+    It moves the sidebar back into view.
+    */
+    .sidebar:not(.hidden) {
+        transform: translateX(0);
+    }
+    
+    /* Optional: To show an overlay when the menu is open */
+    body.sidebar-open .content {
+        filter: brightness(50%); /* Dims the content */
+    }
+
+    /* 3. The content on mobile should be in a single column */
+    .content {
+        padding: 10px; /* Adjust padding for mobile */
+    }
+
+    /* 4. The cards should stack vertically */
+    .cards,
+    .stats-calendar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .card,
+    .stats,
+    .calendar {
+        width: 100%;
+        flex: none; /* Prevents flexbox from forcing them into a row */
+    }
+}
   </style>
 </head>
 <body>
 
 <!-- ====== SIDEBAR ====== -->
-<aside class="sidebar">
+<aside id="sidebar" class="sidebar">
   <div class="logo">
     <h2>SSIHMS</h2>
     <p>Dashboard</p>
@@ -173,6 +223,7 @@
       <li class="active">Overview</li>
       <li><a href="hospitals/">Revenue</a></li>
       <li>Department</a></li>
+      <li><a href='surgeries/'>Surgeries<a/><li>
     </ul>
   </nav>
 
@@ -218,7 +269,7 @@
   <div class="top-bar">
     <input type="text" placeholder="Search anything here">
     <div class="user-info">
-      <span>Todays Data 👋</span>
+      <span> <a href="javascript:void(0)" onclick="toggleNav()">✖ Close</a></span>
     </div>
   </div>
 
@@ -238,8 +289,8 @@
     </div>
 
     <div class="card">
-      <h3>Total discharges</h3>
-      <p class="number">{{total_discharges}} <span class="change">+165</span></p>
+      <h3>Total Surgeries</h3>
+      <p class="number">{{surgeries}} <span class="change">+165</span></p>
       <p>Visitor data obtained for the last 7 days from 10.2% to 15.7%</p>
       <p class="sub">1,345 today</p>
     </div>
@@ -318,11 +369,13 @@
 </main>
 
 <script>
-    const labels = {{ labels|safe }};
-    const newvisits = {{ newvisits|safe }};
-    const revisits = {{ revisits|safe }};
-    const discharges = {{ discharges|safe }};
-    const admissions = {{ admissions|safe }};
+   
+const labels = {{ labels|default:"[]"|safe }};
+const newvisits = {{ newvisits|default:"[]"|safe }};
+const revisits = {{ revisits|default:"[]"|safe }};
+const discharges = {{ discharges|default:"[]"|safe }};
+const admissions = {{ admissions|default:"[]"|safe }};
+
 
     const ctx = document.getElementById('visitChart').getContext('2d');
 
@@ -364,6 +417,13 @@
             }
         }
     });
+    function toggleNav() {
+    document.getElementById("sidebar").classList.toggle("hidden");
+  }
+ 
 </script>
+
+ 
+  
 </body>
 </html>

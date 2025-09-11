@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.db.models import Sum, Q
-from app.models import HospitalVisit
-from app.models import HospitalMaster
+from app.models import HospitalVisit, HospitalMaster
+import json
+
 
 def about(request):
     return render(request, 'about.html')
+
 
 def hospital_overview1(request):
     hospitals = HospitalVisit.objects.values_list('hospital', flat=True).distinct()
@@ -17,16 +19,17 @@ def hospital_overview1(request):
         'selected_department': selected_department,
     }
 
-    # Overall stats (when no hospital selected)
     if not selected_hospital:
+        # ===== Overall Stats =====
         overall_qs = HospitalVisit.objects.all()
         context['total_discharges'] = overall_qs.filter(category__iexact='DISCHARGES').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_admissions'] = overall_qs.filter(category__iexact='ADMISSIONS').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_new'] = overall_qs.filter(subcatg__iexact='NEWVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_revisit'] = overall_qs.filter(subcatg__iexact='REVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
         context['totals'] = overall_qs.aggregate(total=Sum('thevalue'))['total'] or 0
+        context['surgeries'] = overall_qs.filter(category__iexact='SURGERIES').count()
 
-        # For Chart.js: group by month/year (or any time period you want)
+        # ===== Chart Data =====
         chart_stats = (
             overall_qs.values('theyr', 'themnth')
             .annotate(
@@ -37,31 +40,44 @@ def hospital_overview1(request):
             )
             .order_by('theyr', 'themnth')
         )
-        context['labels'] = [f"{row['theyr']}-{row['themnth']}" for row in chart_stats]
-        context['newvisits'] = [row['newvisits'] or 0 for row in chart_stats]
-        context['revisits'] = [row['revisits'] or 0 for row in chart_stats]
-        context['discharges'] = [row['discharges'] or 0 for row in chart_stats]
-        context['admissions'] = [row['admissions'] or 0 for row in chart_stats]
 
-        # Department comparison for chart (optional)
+        labels = [f"{row['theyr']}-{row['themnth']}" for row in chart_stats]
+        newvisits = [row['newvisits'] or 0 for row in chart_stats]
+        revisits = [row['revisits'] or 0 for row in chart_stats]
+        discharges = [row['discharges'] or 0 for row in chart_stats]
+        admissions = [row['admissions'] or 0 for row in chart_stats]
+
+        context.update({
+            'labels': json.dumps(labels),
+            'newvisits': json.dumps(newvisits),
+            'revisits': json.dumps(revisits),
+            'discharges': json.dumps(discharges),
+            'admissions': json.dumps(admissions),
+        })
+
+        # ===== Dept Comparison =====
         dept_stats = (
             overall_qs.values('speciality')
             .annotate(total=Sum('thevalue'))
             .order_by('speciality')
         )
-        context['dept_labels'] = [d['speciality'] for d in dept_stats]
-        context['dept_values'] = [d['total'] for d in dept_stats]
+        dept_labels = [d['speciality'] for d in dept_stats]
+        dept_values = [d['total'] or 0 for d in dept_stats]
+
+        context['dept_labels'] = json.dumps(dept_labels)
+        context['dept_values'] = json.dumps(dept_values)
 
     else:
-        # Stats for selected hospital
+        # ===== Stats for Selected Hospital =====
         hospital_qs = HospitalVisit.objects.filter(hospital__iexact=selected_hospital)
         context['total_discharges'] = hospital_qs.filter(category__iexact='DISCHARGES').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_admissions'] = hospital_qs.filter(category__iexact='ADMISSIONS').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_new'] = hospital_qs.filter(subcatg__iexact='NEWVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
         context['total_revisit'] = hospital_qs.filter(subcatg__iexact='REVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
         context['totals'] = hospital_qs.aggregate(total=Sum('thevalue'))['total'] or 0
+        context['surgeries'] = hospital_qs.filter(category__iexact='SURGERIES').count()
 
-        # For Chart.js: group by month/year for selected hospital
+        # ===== Chart Data =====
         chart_stats = (
             hospital_qs.values('theyr', 'themnth')
             .annotate(
@@ -72,17 +88,26 @@ def hospital_overview1(request):
             )
             .order_by('theyr', 'themnth')
         )
-        context['labels'] = [f"{row['theyr']}-{row['themnth']}" for row in chart_stats]
-        context['newvisits'] = [row['newvisits'] or 0 for row in chart_stats]
-        context['revisits'] = [row['revisits'] or 0 for row in chart_stats]
-        context['discharges'] = [row['discharges'] or 0 for row in chart_stats]
-        context['admissions'] = [row['admissions'] or 0 for row in chart_stats]
 
-        # List of departments
+        labels = [f"{row['theyr']}-{row['themnth']}" for row in chart_stats]
+        newvisits = [row['newvisits'] or 0 for row in chart_stats]
+        revisits = [row['revisits'] or 0 for row in chart_stats]
+        discharges = [row['discharges'] or 0 for row in chart_stats]
+        admissions = [row['admissions'] or 0 for row in chart_stats]
+
+        context.update({
+            'labels': json.dumps(labels),
+            'newvisits': json.dumps(newvisits),
+            'revisits': json.dumps(revisits),
+            'discharges': json.dumps(discharges),
+            'admissions': json.dumps(admissions),
+        })
+
+        # ===== Departments =====
         departments = hospital_qs.values_list('speciality', flat=True).distinct()
         context['departments'] = departments
 
-        # Department stats for each department
+        # Stats per department
         department_stats = {}
         for dept in departments:
             outpatients = hospital_qs.filter(speciality__iexact=dept, subcatg__iexact='NEWVISIT').aggregate(total=Sum('thevalue'))['total'] or 0
@@ -93,10 +118,9 @@ def hospital_overview1(request):
             }
         context['department_stats'] = department_stats
 
-        # If a department is selected, show time series for charts
+        # ===== Department Time-Series (if selected) =====
         if selected_department:
             dept_qs = hospital_qs.filter(speciality__iexact=selected_department)
-            # Example: monthly stats for chart
             monthly_stats = (
                 dept_qs.values('theyr', 'themnth')
                 .annotate(
@@ -105,8 +129,16 @@ def hospital_overview1(request):
                 )
                 .order_by('theyr', 'themnth')
             )
-            context['dept_time_labels'] = [f"{row['theyr']}-{row['themnth']}" for row in monthly_stats]
-            context['dept_outpatients'] = [row['outpatients'] or 0 for row in monthly_stats]
-            context['dept_inpatients'] = [row['inpatients'] or 0 for row in monthly_stats]
- 
-    return render(request,'home.html',context)
+
+            dept_time_labels = [f"{row['theyr']}-{row['themnth']}" for row in monthly_stats]
+            dept_outpatients = [row['outpatients'] or 0 for row in monthly_stats]
+            dept_inpatients = [row['inpatients'] or 0 for row in monthly_stats]
+
+            context.update({
+                'dept_time_labels': json.dumps(dept_time_labels),
+                'dept_outpatients': json.dumps(dept_outpatients),
+                'dept_inpatients': json.dumps(dept_inpatients),
+                'surgeries': dept_qs.filter(category__iexact='SURGERIES').count(),
+            })
+
+    return render(request, 'home.html', context)

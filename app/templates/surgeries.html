@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCenter Pro - Surgical Dashboard</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    min-height: 100vh;
+}
+.container {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    background: #fff;
+    padding: 0;
+    border-radius: 0;
+    display: flex;
+}
+nav {
+    width: 260px;
+    min-width: 220px;
+    max-width: 320px;
+    margin-right: 0;
+    background: #f4f8fb;
+    padding: 32px 24px 24px 24px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+}
+main {
+    flex: 1;
+    padding: 40px 40px 40px 40px;
+    min-width: 0;
+    min-height: 100vh;
+    overflow-x: auto;
+}
+.brand { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; }
+ul { list-style: none; padding: 0; }
+li { margin-bottom: 8px; cursor: pointer; }
+li.active { font-weight: bold; color: #100d0dff; }
+.profile { margin-top: 32px; font-size: 0.95em; color: #dbd1d1ff; }
+.avatar { background: #ffff; color: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px; }
+h2 { margin-top: 0; }
+.stats-grid { display: flex; gap: 24px; margin-bottom: 32px; }
+.stat-card { background: #f4f8fb; border-radius: 8px; padding: 20px 24px; flex: 1; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-number { font-size: 2.2em; font-weight: bold; color: #080808ff; }
+.stat-label { font-size: 1em; color: #050505ff; margin-top: 8px; }
+.chart-section { margin: 32px 0; }
+.procedures-grid-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid #0a0a0aff;
+    background: #fafbfc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.procedures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    padding: 12px;
+}
+@media (max-width: 900px) {
+    .container { flex-direction: column; }
+    nav { width: 100%; max-width: 100vw; height: auto; position: static; padding: 20px; }
+    main { padding: 20px; }
+    .procedures-grid-wrapper { max-height: 320px; }
+    .procedures-grid { grid-template-columns: 1fr; }
+}
+.procedure-card { background: #f7f7fa; border-radius: 8px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.03); }
+.procedure-title { font-size: 1.1em; font-weight: bold; margin-bottom: 6px; color: #1976d2; }
+.procedure-desc { font-size: 0.97em; color: #444; }
+</style>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <nav>
+        <div>
+            <div class="brand">
+                <svg fill="currentColor" viewBox="0 0 24 24" width="28" height="28">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+                <h1>MedCenter Pro</h1>
+            </div>
+
+            <ul>
+                <li class="{% if not department %}active{% endif %}" onclick="window.location.href='?department='">Dashboard</li>
+            </ul>
+
+            <h3>Departments</h3>
+            <ul>
+                {% for dept in surgeries_department %}
+                    <li class="{% if department == dept %}active{% endif %}" onclick="window.location.href='?department={{ dept }}'">{{ dept }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="profile">
+            <div class="avatar">AJ</div>
+            <div>
+                <div>Dr. Alex Johnson</div>
+                <div style="font-size:0.8rem;color:#666;">Cardiology Dept.</div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <h2>{{ department|default:"Dashboard" }}</h2>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.surgeries_count }}</div>
+                <div class="stat-label">Total Procedures</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.success_rate }}%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.active_patients }}</div>
+                <div class="stat-label">Active Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.scheduled_today }}</div>
+                <div class="stat-label">Scheduled Today</div>
+            </div>
+        </section>
+
+        <section class="chart-section">
+            <h3>Procedures Overview</h3>
+            <canvas id="proceduresChart" height="80"></canvas>
+        </section>
+
+        <section>
+            <h3>Procedures</h3>
+            <div class="procedures-grid-wrapper">
+                <div class="procedures-grid">
+                    {% if surgeries_subcatg %}
+                        {% for subcat in surgeries_subcatg %}
+                            <div class="procedure-card">
+                                <div class="procedure-title">{{ subcat }}</div>
+                                <div class="procedure-desc">Details for {{ subcat }}...</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Select a department to view procedures.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Example: Chart for procedures (replace with real data if available)
+    const ctx = document.getElementById('proceduresChart').getContext('2d');
+    const labels = [
+        {% if surgeries_subcatg %}
+            {% for subcat in surgeries_subcatg %}
+                "{{ subcat }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        {% else %}
+            "No Data"
+        {% endif %}
+    ];
+    const data = [
+        {% if surgeries_subcatg %}
+            {% for subcat in surgeries_subcatg %}
+                Math.floor(Math.random() * 50) + 10{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        {% else %}
+            0
+        {% endif %}
+    ];
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Procedures Count',
+                data: data,
+                backgroundColor: '#1976d2',
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
