@@ -305,6 +305,67 @@ def hospital_report(request):
     }
 
     return render(request, 'hopital_report.html', context)
+def Surgeries(request):
+    # Base Query: Get all surgeries
+    surgeries = HospitalVisit.objects.filter(category__iexact="SURGERIES")
+
+    # Get unique departments for the sidebar
+    surgeries_department = surgeries.values_list('speciality', flat=True).distinct()
+
+    # Get the selected department from the GET parameters
+    department = request.GET.get("department")
+
+    # Filter surgeries by the selected department, if one exists
+    if department:
+        filtered_surgeries = surgeries.filter(speciality=department)
+    else:
+        filtered_surgeries = surgeries
+    
+    # Calculate Dashboard Statistics
+    # You'll need to define what these fields mean in your model (e.g., a 'success' boolean, 'is_active' field, 'scheduled_date' field)
+    total_procedures = filtered_surgeries.count()
+
+    # Example: Calculating success rate (assuming a 'success' field exists)
+    # success_rate = filtered_surgeries.filter(success=True).count() / total_procedures if total_procedures > 0 else 0
+    # For now, let's use a placeholder until you provide more info on your model fields.
+    success_rate = 95.5 # Placeholder
+
+    # Example: Counting active patients (assuming a 'is_active' or similar field)
+    # active_patients = filtered_surgeries.filter(is_active=True).distinct('patient_id').count()
+    # For now, let's use a placeholder.
+    active_patients = 125 # Placeholder
+
+    # Example: Counting scheduled today (assuming a 'scheduled_date' field)
+    # from datetime import date
+    # scheduled_today = filtered_surgeries.filter(scheduled_date=date.today()).count()
+    # For now, let's use a placeholder.
+    scheduled_today = 8 # Placeholder
+
+    # Get unique subcategories/descriptions for the filtered department
+    if department:
+        surgeries_subcatg = filtered_surgeries.values_list('subcatg', flat=True).distinct()
+    else:
+        surgeries_subcatg = None
+
+    # Combine all stats into a single dictionary
+    stats = {
+        "surgeries_count": total_procedures,
+        "success_rate": success_rate,
+        "active_patients": active_patients,
+        "scheduled_today": scheduled_today,
+    }
+
+    return render(
+        request,
+        "surgeries.html",
+        {
+            "surgeries": filtered_surgeries,
+            "surgeries_department": surgeries_department,
+            "surgeries_subcatg": surgeries_subcatg,
+            "stats": stats,
+            "department": department # Pass the selected department to the template
+        },
+    )
 
 # views.py
 from django.shortcuts import render
