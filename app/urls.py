@@ -8,10 +8,6 @@ urlpatterns = [
     path('hospitalsb/<str:hospital_code>/', views.hospital_profile, name='hospital_profile'),
     path('hospital-report/', views.hospital_report, name='hospital_report'),
     path('hospitals/', views.hospital_overview, name='hospital'),
-<<<<<<< HEAD
-    path('department/', views.hospitaloverview, name='department_filter'),
-=======
->>>>>>> bbcebacedd8ec635bc47f19c0223c1fa1bfee187
     path('surgeries/', views.Surgeries, name='surgeries'),
 
   # updated here
