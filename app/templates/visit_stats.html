@@ -80,52 +80,64 @@
     </div>
 
     <script>
-        const labels = {{ labels|safe }};
-        const newvisits = {{ newvisits|safe }};
-        const revisits = {{ revisits|safe }};
-        const discharges = {{ discharges|safe }};
-        const admissions = {{ admissions|safe }};
+     const labels = {{ labels|safe }};
+const newvisits = {{ newvisits|safe }};
+const revisits = {{ revisits|safe }};
+const discharges = {{ discharges|safe }};
+const admissions = {{ admissions|safe }};
 
-        const ctx = document.getElementById('visitChart').getContext('2d');
+const ctx = document.getElementById('visitChart').getContext('2d');
 
-        const visitChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'New Visits',
-                        data: newvisits,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                    },
-                    {
-                        label: 'Revisits',
-                        data: revisits,
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                    },
-                    {
-                        label: 'Discharges',
-                        data: discharges,
-                        backgroundColor: 'rgba(25, 213, 122, 0.7)'
-                    },
-                    {
-                        label: 'Admissions',
-                        data: admissions,
-                        backgroundColor: 'rgba(174, 20, 97, 0.7)'
-                    }
-                ]
+const visitChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'New Visits',
+                data: newvisits,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)'
             },
-            options: {
-                responsive: false,
-                scales: {
-                    x: { stacked: false },
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 100 }
-                    }
+            {
+                label: 'Revisits',
+                data: revisits,
+                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+            },
+            {
+                label: 'Discharges',
+                data: discharges,
+                backgroundColor: 'rgba(25, 213, 122, 0.7)'
+            },
+            {
+                label: 'Admissions',
+                data: admissions,
+                backgroundColor: 'rgba(174, 20, 97, 0.7)'
+            }
+        ]
+    },
+    options: {
+        responsive: false,
+        scales: {
+            x: {
+                display: false,
+                grid: {
+                    drawTicks: false,
+                    drawBorder: false,
+                    display: false   // removes grid lines
+                }
+            },
+            y: {
+                display: false,
+                grid: {
+                    drawTicks: false,
+                    drawBorder: false,
+                    display: false   // removes grid lines
                 }
             }
-        });
+        }
+    }
+});
+
     </script>
 
 </body>

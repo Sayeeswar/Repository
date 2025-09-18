@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SSSIHMS Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-
   <style>
     body {
       margin: 0;
@@ -137,8 +135,8 @@
 
     .stats, .calendar {
       background-color: #1a1a1a;
-      border-radius: 50px;
-      padding: 50px;
+      border-radius: 12px;
+      padding: 20px;
       flex: 1;
       box-shadow: 0 2px 5px rgba(0,0,0,0.4);
     }
@@ -166,69 +164,11 @@
     .calendar td:hover {
       background-color: #39ff1460;
     }
-    #visitChart{
-  width: 100% !important;
-  height: 100% !important;
-}
-/* Dropdown container */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropbtn {
-  background: #39ff14;
-  color: black;
-  font-weight: bold;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.3s;
-}
-
-.dropbtn:hover {
-  background: #00cc00;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none; /* hidden by default */
-  position: absolute;
-  right: 0;
-  background-color: #1a1a1a;
-  min-width: 180px;
-  box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
-  border-radius: 8px;
-  z-index: 100;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.dropdown-content a {
-  color: white;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: #39ff1460;
-  color: black;
-}
-
-    
 
     @media (max-width: 768px) {
       .cards, .stats-calendar {
         flex-direction: column;
       }
-      
     }
   </style>
 </head>
@@ -240,23 +180,11 @@
   <ul class="nav-links">
     <li><a href="#" class="active">Overview</a></li>
     <li><a href="hospitals/">Revenue</a></li>
-    <li><a href="surgeries/">Surgeries</a></li>
+    <li><a href="#">Department</a></li>
     <li><a href="{% url 'hospital' %}">Hospital Overview</a></li>
     <li><a href="{% url 'hospital_report' %}">Report</a></li>
-  </ul> 
- <div class="dropdown">
-  <button class="dropbtn" id="hospitalBtn">
-    {% if selected_hospital %}{{ selected_hospital }}{% else %}Select Hospital{% endif %}
-    ▼
-  </button>
-  <div class="dropdown-content" id="hospitalDropdown">
-    <a href="?hospital=">All Hospitals</a>
-    {% for hospital in hospitals %}
-      <a href="?hospital={{ hospital }}">{{ hospital }}</a>
-    {% endfor %}
-  </div>
-</div>
-
+  </ul>
+  <button class="join-btn">Join Club</button>
 </nav>
 
 <!-- ===== CONTENT ===== -->
@@ -288,72 +216,54 @@
       <canvas id="visitChart"></canvas>
     </div>
 
-   
+    <div class="calendar">
+      <h3>Simple Calendar</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th>
+            <th>Thu</th><th>Fri</th><th>Sat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+          <tr><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td></tr>
+          <tr><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td></tr>
+          <tr><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td>28</td></tr>
+          <tr><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </main>
 
-
 <script>
- const labels = {{ labels|safe }};
-        const newvisits = {{ newvisits|safe }};
-        const revisits = {{ revisits|safe }};
-        const discharges = {{ discharges|safe }};
-        const admissions = {{ admissions|safe }};
+const labels = {{ labels|default:"[]"|safe }};
+const newvisits = {{ newvisits|default:"[]"|safe }};
+const revisits = {{ revisits|default:"[]"|safe }};
+const discharges = {{ discharges|default:"[]"|safe }};
+const admissions = {{ admissions|default:"[]"|safe }};
 
-        const ctx = document.getElementById('visitChart').getContext('2d');
-
-        const visitChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'New Visits',
-                        data: newvisits,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
-                    },
-                    {
-                        label: 'Revisits',
-                        data: revisits,
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                    },
-                    {
-                        label: 'Discharges',
-                        data: discharges,
-                        backgroundColor: 'rgba(25, 213, 122, 0.7)'
-                    },
-                    {
-                        label: 'Admissions',
-                        data: admissions,
-                        backgroundColor: 'rgba(174, 20, 97, 0.7)'
-                    }
-                ]
-            },
-            options: {
-                responsive: false,
-                indexAxis:'y',
-                scales: {
-                    x: { stacked: false },
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 100 }
-                    }
-                }
-            }
-        });
-        const hospitalBtn = document.getElementById('hospitalBtn');
-const hospitalDropdown = document.getElementById('hospitalDropdown');
-
-// Toggle dropdown on click
-hospitalBtn.addEventListener('click', function(event) {
-    event.stopPropagation();
-    hospitalDropdown.style.display = hospitalDropdown.style.display === 'block' ? 'none' : 'block';
+const ctx = document.getElementById('visitChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      { label: 'New Visits', data: newvisits, backgroundColor: 'rgba(54, 162, 235, 0.7)' },
+      { label: 'Revisits', data: revisits, backgroundColor: 'rgba(255, 99, 132, 0.7)' },
+      { label: 'Discharges', data: discharges, backgroundColor: 'rgba(25, 213, 122, 0.7)' },
+      { label: 'Admissions', data: admissions, backgroundColor: 'rgba(174, 20, 97, 0.7)' }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
 });
-
-// Close if clicked outside
-document.addEventListener('click', function() {
-    hospitalDropdown.style.display = 'none';
-});
-
 </script>
 
 </body>
