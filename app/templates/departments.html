@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Department Navigator</title>
+  <style>
+    :root {
+      --primary: #007bff;
+      --secondary: #6c757d;
+      --success: #28a745;
+      --danger: #e63946;
+      --info: #457b9d;
+      --light-green: #2a9d8f;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fa;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h1, h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 10px;
+    }
+    
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #0069d9;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+    
+    /* Department chips */
+    .dept-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .dept {
+      padding: 10px 20px;
+      background: var(--success);
+      color: white;
+      border-radius: 30px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .dept:hover {
+      background: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Filter badges */
+    .filter-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    
+    .filter-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .badge-heart { background: var(--danger); }   /* Cardiac */
+    .badge-brain { background: var(--info); }    /* Neuro */
+    .badge-general { background: var(--light-green); } /* General */
+    .badge-other { background: var(--secondary); }   /* Default */
+    
+    /* Accordion */
+    .accordion-container {
+      margin-bottom: 30px;
+    }
+    
+    .accordion {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .accordion:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    .accordion-btn {
+      width: 100%;
+      text-align: left;
+      padding: 18px 24px;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.3s ease;
+    }
+    
+    .accordion-btn:hover {
+      background: #f8f9fa;
+    }
+    
+    .accordion-btn:after {
+      content: '+';
+      font-size: 20px;
+      color: var(--primary);
+    }
+    
+    .accordion-btn.active:after {
+      content: '-';
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      padding: 0 24px;
+      background: white;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .accordion-content-inner {
+      padding: 20px 0;
+    }
+    
+    /* Surgery item */
+    .surgery-item {
+      padding: 15px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .surgery-item:last-child {
+      border-bottom: none;
+    }
+    
+    .surgery-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .surgery-details {
+      font-size: 14px;
+      color: #6c757d;
+    }
+    
+    /* Empty state */
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: #6c757d;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .btn, .dept {
+        padding: 10px 16px;
+      }
+      
+      .accordion-btn {
+        padding: 14px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hospital Department Navigator</h1>
+    
+    {% if selected_hospital %}
+      <div class="btn-group">
+        <a class="btn btn-primary" href="?hospital={{ selected_hospital }}">{{ selected_hospital }}</a>
+        <a class="btn btn-secondary" href=".">Back to All Hospitals</a>
+      </div>
+    {% else %}
+      <h2>Select a Hospital</h2>
+      <div class="btn-group">
+        {% for h in hospitals %}
+          <a class="btn btn-primary" href="?hospital={{ h }}">{{ h }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if selected_hospital %}
+      <h2>Departments in {{ selected_hospital }}</h2>
+      <div class="dept-group">
+        {% for dept in specialities %}
+          <a class="dept" href="?hospital={{ selected_hospital }}&department={{ dept }}">
+            {{ dept }}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if selected_department %}
+      <div class="filter-section">
+        <h2>Surgeries in {{ selected_department }}</h2>
+        
+        <div class="filter-group">
+          <span class="filter-label">Filter by Type:</span>
+          <a class="badge badge-heart" href="?hospital={{ selected_hospital }}&department={{ selected_department }}&subcatg=Cardiac">Cardiac</a>
+          <a class="badge badge-brain" href="?hospital={{ selected_hospital }}&department={{ selected_department }}&subcatg=Neuro">Neuro</a>
+          <a class="badge badge-general" href="?hospital={{ selected_hospital }}&department={{ selected_department }}&subcatg=General">General</a>
+          <a class="badge badge-other" href="?hospital={{ selected_hospital }}&department={{ selected_department }}">All</a>
+        </div>
+        
+        <div class="accordion-container">
+          {% if qs %}
+            {% for surgery in qs %}
+              <div class="accordion">
+                <button class="accordion-btn">
+                  <span>{{ surgery.catg }}</span>
+                  <span class="badge">
+                    {{ surgery.catg }}
+                  </span>
+                </button>
+                <div class="accordion-content">
+                  <div class="accordion-content-inner">
+                    <div class="surgery-item">
+                      <div class="surgery-name">{{ surgery.name }}</div>
+                      <div class="surgery-details">
+                        {% if surgery.subcatg %}<p>{{ surgery.subcatg }}</p>{% endif %}
+                       <!-- <p><strong>Duration:</strong> {{ surgery.duration }} minutes</p>
+                        <p><strong>Specialist:</strong> {{ surgery.specialist }}</p> --> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <p>No surgeries found for the selected criteria.</p>
+            </div>
+          {% endif %}
+        </div>
+        
+        <a class="btn btn-secondary" href="?hospital={{ selected_hospital }}">← Back to Departments</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    // Accordion functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const accordionBtns = document.querySelectorAll('.accordion-btn');
+      
+      accordionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.classList.toggle('active');
+          const content = this.nextElementSibling;
+          
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + 'px';
+          }
+        });
+      });
+      
+      // Open first accordion by default
+      if (accordionBtns.length > 0) {
+        accordionBtns[0].click();
+      }
+    });
+  </script>
+</body>
+</html>

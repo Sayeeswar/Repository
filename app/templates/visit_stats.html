@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Visit Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .modern-input {
+            padding: 10px 14px;
+            border: 1.5px solid #4f8cff;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-right: 8px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modern-input:focus {
+            border-color: #235390;
+            box-shadow: 0 0 4px #4f8cff44;
+        }
+
+        .modern-btn {
+            background: linear-gradient(90deg, #4f8cff 0%, #235390 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(79, 140, 255, 0.15);
+            transition: background 0.3s, transform 0.2s;
+            margin-left: 8px;
+        }
+
+        .modern-btn:hover {
+            background: linear-gradient(90deg, #43e97b 0%, #fabb00 50%, #ff5722 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+
+        .modern-btn:active {
+            background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+        }
+    </style>
+</head>
+<body>
+
+    <form method="get" style="margin-bottom: 1em;">
+        <input type="text" class="modern-input" name="speciality" placeholder="Enter Speciality" value="{{ speciality }}">
+        <input type="text" class="modern-input" name="hospital" placeholder="Enter Hospital" value="{{ hospital }}">
+        <input type="text" class="modern-input" name="year" placeholder="Enter Year" value="{{ year }}">
+        <button type="submit" class="modern-btn">Search</button>
+    </form>
+
+    <h2>Patient Visit Counts by Speciality</h2>
+
+    <div style="display: flex; gap: 32px; align-items: flex-start;">
+        <table border="1">
+            <tr>
+                <th>Speciality</th>
+                <th>New Visits</th>
+                <th>Revisits</th>
+                <th>Discharges</th>
+                <th>Admissions</th>
+            </tr>
+            {% for spec, values in stats %}
+            <tr>
+                <td>{{ spec }}</td>
+                <td>{{ values.NEWVISIT }}</td>
+                <td>{{ values.REVISIT }}</td>
+                <td>{{ values.DISCHARGES }}</td>
+                <td>{{ values.ADMISSIONS }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div style="max-width: 700px;">
+            <canvas id="visitChart" width="600" height="350"></canvas>
+        </div>
+    </div>
+
+    <script>
+     const labels = {{ labels|safe }};
+const newvisits = {{ newvisits|safe }};
+const revisits = {{ revisits|safe }};
+const discharges = {{ discharges|safe }};
+const admissions = {{ admissions|safe }};
+
+const ctx = document.getElementById('visitChart').getContext('2d');
+
+const visitChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'New Visits',
+                data: newvisits,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+            },
+            {
+                label: 'Revisits',
+                data: revisits,
+                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+            },
+            {
+                label: 'Discharges',
+                data: discharges,
+                backgroundColor: 'rgba(25, 213, 122, 0.7)'
+            },
+            {
+                label: 'Admissions',
+                data: admissions,
+                backgroundColor: 'rgba(174, 20, 97, 0.7)'
+            }
+        ]
+    },
+    options: {
+        responsive: false,
+        scales: {
+            x: {
+                display: false,
+                grid: {
+                    drawTicks: false,
+                    drawBorder: false,
+                    display: false   // removes grid lines
+                }
+            },
+            y: {
+                display: false,
+                grid: {
+                    drawTicks: false,
+                    drawBorder: false,
+                    display: false   // removes grid lines
+                }
+            }
+        }
+    }
+});
+
+    </script>
+
+</body>
+</html>

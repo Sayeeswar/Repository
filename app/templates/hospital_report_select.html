@@ -1,0 +1,9 @@
+<h2>Select Hospital to View Report</h2>
+<form method="get" action="{% url 'hospital_report' %}">
+  <select name="hospital">
+    {% for hosp in hospitals %}
+      <option value="{{ hosp }}">{{ hosp }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Generate Report</button>
+</form>

@@ -1,2 +1,0 @@
-# Repository
-Djangi code

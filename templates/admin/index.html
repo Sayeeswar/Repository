@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+{% block content %}
+    {{ block.super }}
+    <div style="margin-top:2em;">
+        <h2>Custom Reports</h2>
+        <ul>
+            <li><a href="{% url 'visit_stats' %}" target="_blank">Visit Stats</a></li>
+            <li><a href="{% url 'hospital_filter' %}" target="_blank">Hospital Filter</a></li>
+        </ul>
+    </div>
+{% endblock %}

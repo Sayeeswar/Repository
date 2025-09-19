@@ -1,0 +1,35 @@
+asgiref==3.8.1
+beautifulsoup4==4.13.4
+bs4==0.0.2
+certifi==2025.7.14
+cffi==1.17.1
+charset-normalizer==3.4.2
+contourpy==1.3.3
+cryptography==45.0.6
+cycler==0.12.1
+Django==5.2.2
+fonttools==4.59.0
+idna==3.10
+kiwisolver==1.4.8
+matplotlib==3.10.5
+numpy==2.3.2
+oracledb==3.3.0
+packaging==25.0
+pandas==2.3.1
+pillow==11.3.0
+pycparser==2.22
+pyparsing==3.2.3
+python-dateutil==2.9.0.post0
+pytz==2025.2
+requests==2.32.4
+six==1.17.0
+soupsieve==2.7
+sqlparse==0.5.3
+typing_extensions==4.14.1
+tzdata==2025.2
+urllib3==2.5.0     # or whatever version you're using
+gunicorn             # WSGI server for production
+django-environ       # for environment variables
+whitenoise           # to serve static files easily on Render
+psycopg2-binary      # PostgreSQL driver (Render uses PostgreSQL by default)
+

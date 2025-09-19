@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospital Overview</title>
+  <style>
+    .button-container {
+      margin: 20px 0;
+    }
+    .button-container button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      background: #007BFF;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .button-container button:hover {
+      background: #0056b3;
+    }
+  </style>
+  <script>
+    function selectHospital(hospital) {
+      // Hide all hospital buttons
+      document.getElementById("hospital-buttons").style.display = "none";
+
+      // Redirect with ?hospital= selected
+      const url = new URL(window.location.href);
+      url.searchParams.set("hospital", hospital);
+      window.location.href = url.toString();
+    }
+
+    function selectDepartment(dept) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("departments", dept);
+      window.location.href = url.toString();
+    }
+  </script>
+</head>
+<body>
+  <h1>Hospital Overview</h1>
+
+  <!-- Hospital Buttons -->
+  {% if not selected_hospital %}
+    <div id="hospital-buttons" class="button-container">
+      {% for h in hospitals %}
+        <button onclick="selectHospital('{{ h }}')">{{ h }}</button>
+      {% endfor %}
+    </div>
+  {% else %}
+    <h2>Selected Hospital: {{ selected_hospital }}</h2>
+
+    <!-- Department Buttons -->
+    <div class="button-container">
+      {% for dept in departments %}
+        <button onclick="selectDepartment('{{ dept }}')">{{ dept }}</button>
+      {% endfor %}
+    </div>
+
+    <!-- Department stats -->
+    {% if department_stats %}
+      <h3>Department Stats</h3>
+      <ul>
+        {% for dept, stats in department_stats.items %}
+          <li>
+            <b>{{ dept }}</b> → Outpatients: {{ stats.outpatients }}, Inpatients: {{ stats.inpatients }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+
+  <!-- Optional: Time series chart data for selected department -->
+  
+</body>
+</html>

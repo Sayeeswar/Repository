@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCenter Pro - Surgical Dashboard</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    margin: 0;
+    min-height: 100vh;
+    color: white;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #1a1a1a;
+    padding: 15px 30px;
+    position: relative;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #39ff14;
+}
+.logo span {
+    color: white;
+    margin-left: 5px;
+}
+.nav-links {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+}
+.nav-links li {
+    position: relative;
+}
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    transition: 0.3s;
+}
+.nav-links a:hover,
+.nav-links a.active {
+    color: #39ff14;
+}
+.nav-links a.active::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: #39ff14;
+    left: 0;
+    bottom: -5px;
+}
+.join-btn {
+    background: #39ff14;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.join-btn:hover { background: #00cc00; }
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+}
+.hamburger div {
+    width: 25px;
+    height: 3px;
+    background: white;
+    transition: 0.3s;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .nav-links {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: #1a1a1a;
+        padding: 20px;
+        gap: 15px;
+        display: none;
+    }
+    .nav-links.show { display: flex; }
+    .join-btn { display: none; }
+    .hamburger { display: flex; }
+}
+ 
+/* Dashboard */
+main {
+    padding: 40px;
+}
+h2 { margin-top: 0; }
+.stats-grid {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+.stat-card {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px 24px;
+    flex: 1 1 200px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.stat-number {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #39ff14;
+}
+.stat-label { font-size: 1em; color: #aaa; margin-top: 8px; }
+
+/* Procedures */
+.procedures-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+.procedure-card {
+    background: #222;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.procedure-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #39ff14;
+}
+.procedure-desc { font-size: 0.97em; color: #ccc; }
+<style>
+.department-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 32px 0;
+    padding: 0 20px;
+}
+
+.dept-pill {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: #222;
+    color: #ccc;
+    font-size: 0.95em;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.dept-pill:hover {
+    background: #39ff14;
+    color: black;
+    transform: scale(1.05);
+}
+
+.dept-pill.active {
+    background: #39ff14;
+    color: black;
+}
+<style>
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background: #39ff14;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.dropbtn:hover { background: #00cc00; }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #222;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.4);
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: #39ff14;
+    color: black;
+}
+
+.dropdown.show .dropdown-content {
+    display: block;
+}
+</style>
+
+</style>
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav>
+  <div class="logo">SSIHMS <span>Dashboard</span></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Overview</a></li>
+    <li><a href="hospitals/">Revenue</a></li>
+    <li><a href="surgeries/">Surgeries</a></li>
+    <li><a href="{% url 'hospital' %}">Hospital Overview</a></li>
+    <li><a href="{% url 'hospital_report' %}">Report</a></li>
+  </ul> 
+ <div class="dropdown">
+  <button class="dropbtn" id="hospitalBtn">
+    {% if selected_hospital %}{{ selected_hospital }}{% else %}Select Hospital{% endif %}
+    ▼
+  </button>
+  <div class="dropdown-content" id="hospitalDropdown">
+    <a href="?hospital=">All Hospitals</a>
+    {% for hospital in hospitals %}
+      <a href="?hospital={{ hospital }}">{{ hospital }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+</nav>
+
+
+
+  <!-- Department Filter Bar -->
+<div class="department-bar">
+  <a href="?{% if selected_hospital %}hospital={{ selected_hospital }}&{% endif %}" 
+     class="dept-pill {% if not department %}active{% endif %}">
+     All Departments
+  </a>
+  {% for dept in surgeries_department %}
+    <a href="?{% if selected_hospital %}hospital={{ selected_hospital }}&{% endif %}department={{ dept }}" 
+       class="dept-pill {% if department == dept %}active{% endif %}">
+       {{ dept }}
+    </a>
+  {% endfor %}
+</div>
+
+
+  <button class="join-btn">Profile</button>
+
+  <!-- Hamburger -->
+  <div class="hamburger" onclick="toggleMenu()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+
+<!-- Dashboard -->
+<main>
+  <h2>{{ department|default:"Dashboard" }}</h2>
+
+  <section class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.surgeries_count }}</div>
+      <div class="stat-label">Total Procedures</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.success_rate }}%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.active_patients }}</div>
+      <div class="stat-label">Active Patients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.scheduled_today }}</div>
+      <div class="stat-label">Scheduled Today</div>
+    </div>
+  </section>
+
+  <!-- Chart Section -->
+  <section class="chart-section">
+    <h3>Procedures Overview</h3>
+    <canvas id="proceduresChart" height="80"></canvas>
+  </section>
+
+  <!-- Procedures directly displayed -->
+  <section>
+    <h3>Procedures</h3>
+    <div class="procedures-grid">
+      {% if surgeries_subcatg %}
+        {% for subcat in surgeries_subcatg %}
+          <div class="procedure-card">
+            <div class="procedure-title">{{ subcat }}</div>
+            <div class="procedure-desc">Details for {{ subcat }}...</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>Select a department to view procedures.</p>
+      {% endif %}
+    </div>
+  </section>
+</main>
+
+<script>
+function toggleMenu() {
+  document.querySelector('.nav-links').classList.toggle('show');
+}
+
+// Chart.js Horizontal Bar Chart
+document.addEventListener("DOMContentLoaded", function() {
+  const ctx = document.getElementById('proceduresChart').getContext('2d');
+
+  const labels = [
+    {% if surgeries_subcatg %}
+      {% for subcat in surgeries_subcatg %}
+        "{{ subcat }}"{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    {% else %}
+      "No Data"
+    {% endif %}
+  ];
+
+  const data = [
+    {% if surgeries_subcatg %}
+      {% for subcat in surgeries_subcatg %}
+        Math.floor(Math.random() * 50) + 10{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    {% else %}
+      0
+    {% endif %}
+  ];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Procedures Count',
+        data: data,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.8)',
+          'rgba(255, 159, 64, 0.8)',
+          'rgba(255, 205, 86, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(54, 162, 235, 0.8)',
+          'rgba(153, 102, 255, 0.8)'
+        ],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { beginAtZero: true }
+      }
+    }
+  });
+});
+
+document.getElementById('hospitalBtn').addEventListener('click', function() {
+    this.parentElement.classList.toggle('show');
+});
+
+// Close dropdown if user clicks outside
+window.addEventListener('click', function(e) {
+    if (!e.target.matches('.dropbtn')) {
+        document.querySelectorAll('.dropdown').forEach(function(drop) {
+            drop.classList.remove('show');
+        });
+    }
+});
+
+</script>
+
+</body>
+</html>
